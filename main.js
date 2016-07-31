@@ -26,13 +26,13 @@ function getMessagesAsHTML(options, cb) {
   //     String page: Subpage after `'https://scratch.mit.edu/messages/'`. `'comments'` or `'alerts'` or `''`. Defaults to `''`.
   //     Number index: Page-index to get messages from, where index 0 has the newest messages. Defaults to `0`.
   //   Function cb:
-  //     Parameters:
-  //       Object error:
-  //         String message
-  //         Number status
-  //         String statusText
-  //         Function call: Function which throws the message property to the console when called.
-  //       Array messages: Array where every element is an HTMLElement with tag `h3` (specifying date for messages below it, but for alerts this info is in the actual message instead) or `li` (actual messages).
+  //   Parameters:
+  //     Object error:
+  //       String message
+  //       Number status
+  //       String statusText
+  //       Function call: Function which throws the message property to the console when called.
+  //     Array messages: Array where every element is an HTMLElement with tag `h3` (specifying date for messages below it, but for alerts this info is in the actual message instead) or `li` (actual messages).
   //
   // Returns: `undefined`
   
@@ -75,16 +75,20 @@ function getMessages(options, cb) {
   //     String page: The messages subpage, `'comments'` or `'alerts'` or `''`, to add to the messages URL. Lower priority than `commentsOnly` and `alertsOnly`. Defaults to `''`.
   //     Function filter: Called for every message, decides whether or not a message is to be included or not:
   //     Parameters:
-  //       ScratchMessage message: the message to be filtered (or not filtered)
+  //       ScratchMessage message: the message to be (or not to be) filtered
+  //     Number wait: How long to wait between individual HTTP requests, in milliseconds. Defaults to `4000`.
+  //
   //   Function cb:
-  //     Parameters:
-  //       Object err: Error-object like the one described by `getMessagesAsHTML`.
-  //       Array messages: Array where every element is instance of class `ScratchMessage`.
+  //   Parameters:
+  //     Object err: Error-object like the one described by `getMessagesAsHTML`.
+  //     Array messages: Array where every element is instance of class `ScratchMessage`.
   //
   // Returns: `undefined`
   
   options.limit  = options.limit  || 20
   options.offset = options.offset || 0
+  options.wait   = options.wait   || 4000
+  
   if(options.commentsOnly)    options.page = 'comments'
   else if(options.alertsOnly) options.page = 'alerts'
   
@@ -127,7 +131,7 @@ function getMessages(options, cb) {
       }
       
       if(pushed < limit) {
-        setTimeout(whileLoop.bind(this, pushed, pageIndex + 1, 0, cb), 4000)
+        setTimeout(whileLoop.bind(this, pushed, pageIndex + 1, 0, cb), options.wait)
       } else {
         cb(undefined) 
       }
